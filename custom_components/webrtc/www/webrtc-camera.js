@@ -6,6 +6,11 @@
  * - MediaSource - iPad OS 13+
  *   https://caniuse.com/?search=MediaSource
  */
+
+/*
+  v2.3.0 - propia v1.0
+ */
+
 class WebRTCCamera extends HTMLElement {
     constructor() {
         super();
@@ -435,12 +440,39 @@ class WebRTCCamera extends HTMLElement {
                 this.hass.callService(domain, service, data);
             }
         }
-
+        
+        /*CAF*/
+		const handleStopPTZ = (ev) => {
+            const [domain, service] = this.config.ptz.service.split('.', 2);
+            const data = this.config.ptz.data_stop;
+            if (data) {
+                this.hass.callService(domain, service, data);
+            }
+        }
+		
+		const datastop = this.config.ptz.data_stop;
+        const buttons = ptz.querySelectorAll('ha-icon');
+        buttons.forEach(function (el) {
+			el.addEventListener('touchstart', handlePTZ);
+			if(datastop) {
+				el.addEventListener('mousedown', handlePTZ);
+				el.addEventListener('mouseup', handleStopPTZ);
+				el.addEventListener('touchend', handleStopPTZ);
+			}
+			else {
+				el.addEventListener('click', handlePTZ);
+			}
+        });
+        
+        /* Overrided
         const buttons = ptz.querySelectorAll('ha-icon');
         buttons.forEach(function (el) {
             el.addEventListener('click', handlePTZ);
             el.addEventListener('touchstart', handlePTZ);
         });
+        */
+        
+		/* END CAF */        
     }
 
     async renderGUI(hass) {
